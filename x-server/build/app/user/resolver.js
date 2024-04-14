@@ -34,7 +34,7 @@ const queries = {
                         email: res.data.email,
                         firstName: res.data.given_name,
                         lastName: res.data.family_name,
-                        profileImage: res.data.picture,
+                        profileImage: res.data.picture || undefined,
                     }
                 });
             }
@@ -58,7 +58,17 @@ const queries = {
         catch (error) {
             console.log(error);
         }
+    }),
+    getCurrentUser: (_, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
+        const userInfo = yield db_1.prisma.user.findUnique({ where: { id: (_b = context.User) === null || _b === void 0 ? void 0 : _b.id } });
+        return userInfo;
     })
 };
 const mutation = {};
-exports.resolver = { queries, mutation };
+const extraResolver = {
+    User: {
+        tweets: (perent) => db_1.prisma.tweet.findMany({ where: { author: { id: perent.id } } })
+    }
+};
+exports.resolver = { queries, mutation, extraResolver };

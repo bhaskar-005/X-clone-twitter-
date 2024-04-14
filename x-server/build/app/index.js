@@ -19,25 +19,41 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const index_1 = require("./user/index");
 const cors_1 = __importDefault(require("cors"));
+const jwt_1 = require("../services/jwt");
+const tweet_1 = require("./tweet");
 const initServer = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = (0, express_1.default)();
     app.use((0, cors_1.default)({
-        origin: 'http://localhost:3000'
+        origin: "http://localhost:3000",
     }));
     app.use(body_parser_1.default.json());
     const server = new server_1.ApolloServer({
         typeDefs: `
       ${index_1.user.types}
+      ${tweet_1.Tweet.types}
       type Query{
         ${index_1.user.queries}
+        ${tweet_1.Tweet.queries}
+      }
+      type Mutation{
+        ${tweet_1.Tweet.mutation}
       }
      `,
-        resolvers: {
-            Query: Object.assign({}, index_1.user.resolver.queries),
-        },
+        resolvers: Object.assign(Object.assign({ Query: Object.assign(Object.assign({}, index_1.user.resolver.queries), tweet_1.Tweet.resolver.queries), Mutation: Object.assign({}, tweet_1.Tweet.resolver.mutation) }, index_1.user.resolver.extraResolver), tweet_1.Tweet.resolver.extraResolver),
     });
     yield server.start();
-    app.use("/graphql", (0, express4_1.expressMiddleware)(server));
+    app.use("/graphql", (0, express4_1.expressMiddleware)(server, {
+        //the third perameter of the query is this context
+        context: (_a) => __awaiter(void 0, [_a], void 0, function* ({ req, res }) {
+            var _b;
+            const JWTtoken = (_b = req.headers.__token) === null || _b === void 0 ? void 0 : _b.slice(7);
+            return {
+                User: req.headers.__token
+                    ? yield (0, jwt_1.decodeToken)(JWTtoken)
+                    : undefined,
+            };
+        }),
+    }));
     return app;
 });
 exports.initServer = initServer;

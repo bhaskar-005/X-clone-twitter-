@@ -1,6 +1,9 @@
 import axios from "axios";
 import { prisma } from "../../lib/db";
 import jwt from 'jsonwebtoken'
+import { graphqlContext } from "../../interfaces";
+import { User } from "@prisma/client";
+
 
 interface GoogleTokenPayload {
   iss: string;
@@ -43,7 +46,7 @@ const queries = {
           email:res.data.email,
           firstName:res.data.given_name,
           lastName:res.data.family_name,
-          profileImage:res.data.picture,
+          profileImage:res.data.picture || undefined,
          }
         })
       }
@@ -70,9 +73,18 @@ const queries = {
       console.log(error);
       
     }
+  },
+  getCurrentUser: async(_:any,args:any,context:graphqlContext)=>{
+    const userInfo = await prisma.user.findUnique({where:{id:context.User?.id}}) 
+    return userInfo
   }
 }
 
 const mutation = {}
 
-export const resolver = {queries , mutation}
+const extraResolver = {
+  User:{
+    tweets:(perent:User)=>prisma.tweet.findMany({where:{author:{id:perent.id}}})
+  }
+}
+export const resolver = {queries , mutation,extraResolver}

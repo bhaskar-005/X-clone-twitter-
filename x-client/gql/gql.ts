@@ -13,7 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\nquery verifyUserGoogle($token: String!) {\n    verifyGoogleToken(token: $token)\n}": types.VerifyUserGoogleDocument,
+    "\n  query verifyUserGoogle($token: String!) {\n    verifyGoogleToken(token: $token)\n  }\n": types.VerifyUserGoogleDocument,
+    "\n  query GetCurrentUser {\n    getCurrentUser {\n      email\n      firstName\n      id\n      lastName\n      profileImage\n    }\n  }\n": types.GetCurrentUserDocument,
 };
 
 /**
@@ -33,7 +34,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\nquery verifyUserGoogle($token: String!) {\n    verifyGoogleToken(token: $token)\n}"): (typeof documents)["\nquery verifyUserGoogle($token: String!) {\n    verifyGoogleToken(token: $token)\n}"];
+export function graphql(source: "\n  query verifyUserGoogle($token: String!) {\n    verifyGoogleToken(token: $token)\n  }\n"): (typeof documents)["\n  query verifyUserGoogle($token: String!) {\n    verifyGoogleToken(token: $token)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetCurrentUser {\n    getCurrentUser {\n      email\n      firstName\n      id\n      lastName\n      profileImage\n    }\n  }\n"): (typeof documents)["\n  query GetCurrentUser {\n    getCurrentUser {\n      email\n      firstName\n      id\n      lastName\n      profileImage\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
