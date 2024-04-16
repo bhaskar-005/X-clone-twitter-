@@ -77,6 +77,10 @@ const queries = {
   getCurrentUser: async(_:any,args:any,context:graphqlContext)=>{
     const userInfo = await prisma.user.findUnique({where:{id:context.User?.id}}) 
     return userInfo
+  },
+  getUserById: async(_:any,{id}:{id:string})=>{
+    const User = await prisma.user.findUnique({where:{id:id}})
+    return User
   }
 }
 

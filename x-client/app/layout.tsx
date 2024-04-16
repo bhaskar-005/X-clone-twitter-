@@ -4,6 +4,7 @@ import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import ReactQueryProvider from "@/utils/React-query";
+import Sidebars from "./_components/Sidebars";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <GoogleOAuthProvider clientId={clientId} >
         <ReactQueryProvider>
+          <Sidebars>
          {children}
+         </Sidebars>
          </ReactQueryProvider>
         </GoogleOAuthProvider>
         <Toaster/>

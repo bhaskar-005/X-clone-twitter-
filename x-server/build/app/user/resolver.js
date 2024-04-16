@@ -63,6 +63,10 @@ const queries = {
         var _b;
         const userInfo = yield db_1.prisma.user.findUnique({ where: { id: (_b = context.User) === null || _b === void 0 ? void 0 : _b.id } });
         return userInfo;
+    }),
+    getUserById: (_2, _c) => __awaiter(void 0, [_2, _c], void 0, function* (_, { id }) {
+        const User = yield db_1.prisma.user.findUnique({ where: { id: id } });
+        return User;
     })
 };
 const mutation = {};
