@@ -7,7 +7,10 @@ exports.types = `#graphql
     firstName: String!
     lastName: String!
     email: String!
-    profileImage: String!
+    profileImage: String
     tweets: [Tweet] 
+    followers:[User]
+    following: [User]
+    recommendedUsers:[User]
   }
 `;

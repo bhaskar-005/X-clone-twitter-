@@ -11,9 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolver = void 0;
 const db_1 = require("../../lib/db");
+const redis_1 = require("../../redis");
 const queries = {
     getAllTweets: () => __awaiter(void 0, void 0, void 0, function* () {
-        return yield db_1.prisma.tweet.findMany({ orderBy: { createdAt: 'desc' } });
+        const cachedTweets = yield redis_1.redisClient.get("allTweets");
+        if (cachedTweets) {
+            return JSON.parse(cachedTweets);
+        }
+        const res = yield db_1.prisma.tweet.findMany({ orderBy: { createdAt: 'desc' } });
+        yield redis_1.redisClient.set("allTweets", JSON.stringify(res));
+        return res;
     })
 };
 const mutation = {
@@ -21,6 +28,10 @@ const mutation = {
         var _b;
         if (!((_b = ctx.User) === null || _b === void 0 ? void 0 : _b.id)) {
             throw new Error('You are not authenticated');
+        }
+        const rateLimitFlag = yield redis_1.redisClient.get(`CreateTweetLimite-${ctx.User.id}`);
+        if (rateLimitFlag) {
+            throw new Error('wait for 50s before creating new tweet');
         }
         const res = yield db_1.prisma.tweet.create({
             data: {
@@ -30,6 +41,8 @@ const mutation = {
                 author: { connect: { id: ctx.User.id } }
             }
         });
+        yield redis_1.redisClient.setex(`CreateTweetLimite-${ctx.User.id}`, 30, 1);
+        yield redis_1.redisClient.del('allTweets');
         return res;
     })
 };
