@@ -11,8 +11,7 @@ export const useTweets = ()=>{
         queryKey: ['tweets'],
         queryFn: ()=> graphqlClient.request(getAllTweets)
     })  
-    
-    return {...res , tweets:res.data?.getAllTweets}
+    return {...res, tweets:res.data?.getAllTweets}
 }
 
 export const useCreateTweet = ()=>{
@@ -20,10 +19,15 @@ export const useCreateTweet = ()=>{
     let toastId;
     const res = useMutation({
         mutationFn: (payload:CreateTweetInput) => graphqlClient.request(createTweet ,{payload}),
-        onMutate: ()=> toastId = toast.loading(''),
+        onMutate: ()=> toastId = toast.loading('createing..'),
+        onError:(error)=>{
+            toast.dismiss(toastId!);
+            toast.error(`${error.stack?.slice(6,45)}`)
+        },
         onSuccess: ()=> {
             queryClient.invalidateQueries({queryKey:['tweets']});
             toast.dismiss(toastId!);
+            toast.success('created.');
         },
     })
     return res;

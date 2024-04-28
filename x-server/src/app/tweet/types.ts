@@ -12,5 +12,6 @@ export const types = `#graphql
   imageUrl: String
   videoUrl: String
   author: User
+  createdAt:String
   }
 `
