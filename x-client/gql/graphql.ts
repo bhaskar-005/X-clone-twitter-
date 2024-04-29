@@ -73,7 +73,7 @@ export type User = {
   followers?: Maybe<Array<Maybe<User>>>;
   following?: Maybe<Array<Maybe<User>>>;
   id: Scalars['ID']['output'];
-  lastName: Scalars['String']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
   profileImage?: Maybe<Scalars['String']['output']>;
   recommendedUsers?: Maybe<Array<Maybe<User>>>;
   tweets?: Maybe<Array<Maybe<Tweet>>>;
@@ -116,19 +116,19 @@ export type VerifyUserGoogleQuery = { __typename?: 'Query', verifyGoogleToken?: 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', email: string, firstName: string, id: string, lastName: string, profileImage?: string | null, followers?: Array<{ __typename?: 'User', firstName: string, email: string, lastName: string, id: string, profileImage?: string | null } | null> | null, following?: Array<{ __typename?: 'User', email: string, firstName: string, lastName: string, profileImage?: string | null, id: string } | null> | null, tweets?: Array<{ __typename?: 'Tweet', content: string, id: string, imageUrl?: string | null, videoUrl?: string | null } | null> | null, recommendedUsers?: Array<{ __typename?: 'User', email: string, firstName: string, lastName: string, profileImage?: string | null, id: string } | null> | null } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', getCurrentUser?: { __typename?: 'User', email: string, firstName: string, id: string, lastName?: string | null, profileImage?: string | null, followers?: Array<{ __typename?: 'User', firstName: string, email: string, lastName?: string | null, id: string, profileImage?: string | null } | null> | null, following?: Array<{ __typename?: 'User', email: string, firstName: string, lastName?: string | null, profileImage?: string | null, id: string } | null> | null, tweets?: Array<{ __typename?: 'Tweet', content: string, id: string, imageUrl?: string | null, videoUrl?: string | null } | null> | null, recommendedUsers?: Array<{ __typename?: 'User', email: string, firstName: string, lastName?: string | null, profileImage?: string | null, id: string } | null> | null } | null };
 
 export type GetAllTweetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllTweetsQuery = { __typename?: 'Query', getAllTweets?: Array<{ __typename?: 'Tweet', content: string, imageUrl?: string | null, videoUrl?: string | null, id: string, createdAt?: string | null, author?: { __typename?: 'User', firstName: string, lastName: string, profileImage?: string | null, id: string, email: string } | null } | null> | null };
+export type GetAllTweetsQuery = { __typename?: 'Query', getAllTweets?: Array<{ __typename?: 'Tweet', content: string, imageUrl?: string | null, videoUrl?: string | null, id: string, createdAt?: string | null, author?: { __typename?: 'User', firstName: string, lastName?: string | null, profileImage?: string | null, id: string, email: string } | null } | null> | null };
 
 export type GetUserByIdQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type GetUserByIdQuery = { __typename?: 'Query', getUserById?: { __typename?: 'User', email: string, firstName: string, lastName: string, id: string, profileImage?: string | null, followers?: Array<{ __typename?: 'User', firstName: string, email: string, lastName: string, id: string, profileImage?: string | null } | null> | null, following?: Array<{ __typename?: 'User', email: string, firstName: string, lastName: string, profileImage?: string | null, id: string } | null> | null, tweets?: Array<{ __typename?: 'Tweet', content: string, imageUrl?: string | null, videoUrl?: string | null, id: string, author?: { __typename?: 'User', email: string, firstName: string, lastName: string, profileImage?: string | null, id: string } | null } | null> | null } | null };
+export type GetUserByIdQuery = { __typename?: 'Query', getUserById?: { __typename?: 'User', email: string, firstName: string, lastName?: string | null, id: string, profileImage?: string | null, followers?: Array<{ __typename?: 'User', firstName: string, email: string, lastName?: string | null, id: string, profileImage?: string | null } | null> | null, following?: Array<{ __typename?: 'User', email: string, firstName: string, lastName?: string | null, profileImage?: string | null, id: string } | null> | null, tweets?: Array<{ __typename?: 'Tweet', content: string, imageUrl?: string | null, videoUrl?: string | null, id: string, author?: { __typename?: 'User', email: string, firstName: string, lastName?: string | null, profileImage?: string | null, id: string } | null } | null> | null } | null };
 
 
 export const CreateTweetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTweet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payload"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"createTweetInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTweet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"payload"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payload"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}}]}}]}}]} as unknown as DocumentNode<CreateTweetMutation, CreateTweetMutationVariables>;
