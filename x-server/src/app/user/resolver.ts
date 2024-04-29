@@ -76,10 +76,10 @@ const queries = {
   },
   getCurrentUser: async (_: any, args: any, context: graphqlContext) => {
     if (!context.User?.id) return null;
-    const cachedCurrentUser = await redisClient.get("currentUser");
-    if (cachedCurrentUser) {
-      return JSON.parse(cachedCurrentUser);
-    }
+    // const cachedCurrentUser = await redisClient.get("currentUser");
+    // if (cachedCurrentUser) {
+    //   return JSON.parse(cachedCurrentUser);
+    // }
     const userInfo = await prisma.user.findUnique({
       where: { id: context.User?.id },
     });
@@ -92,7 +92,7 @@ const queries = {
       return JSON.parse(cachedUser);
     }
     const User = await prisma.user.findUnique({ where: { id: id } });
-    await redisClient.setex(`user:${id}`, 140, JSON.stringify(User));
+    // await redisClient.setex(`user:${id}`, 140, JSON.stringify(User));
     return User;
   },
 };
@@ -124,8 +124,8 @@ const mutation = {
         },
       },
     });
-    await redisClient.del(`user:${id}`);
-    await redisClient.del(`currentUser`);
+    // await redisClient.del(`user:${id}`);
+    // await redisClient.del(`currentUser`);
     return true;
   },
 };
