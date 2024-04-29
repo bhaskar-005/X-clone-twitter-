@@ -1,24 +1,28 @@
 "use client";
 import React from "react";
 import { FaXTwitter } from "react-icons/fa6";
-import { BsBell, BsBookmark, BsEnvelope } from "react-icons/bs";
+import { BsBell, BsBookmark, BsEnvelope, BsTwitter } from "react-icons/bs";
 import { BiHash, BiHomeCircle, BiMoney, BiUser } from "react-icons/bi";
 import { SlOptions } from "react-icons/sl";
 import { verifyUserGoogleQuery } from "@/graphql/query/user";
 import Image from "next/image";
 import { useCurrentUser } from "@/hooks/user";
 import { GoogleLogin } from "@react-oauth/google";
+import { useRouter } from 'next/navigation'
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { graphqlClient } from "@/graphql/api";
 import { Data } from "../data";
 import Loading from "./Loading";
 import ErrorPage from "./Error";
+import Recomended from "./Recomended";
+import Link from "next/link";
 const inter = "'Inter', sans-serif";
 
 interface TwitterSidebarButton {
   title: string;
   icon: React.ReactNode;
+  Link?: string;
 }
 interface GoogleCredential {
   clientId: string;
@@ -29,7 +33,8 @@ interface GoogleCredential {
 const sidebarMenuItems: TwitterSidebarButton[] = [
   {
     title: "Home",
-    icon: <BiHomeCircle />,
+    Link: "/",
+    icon: <BiHomeCircle />
   },
   {
     title: "Explore",
@@ -63,8 +68,8 @@ const sidebarMenuItems: TwitterSidebarButton[] = [
 
 const Sidebars = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading, error } = useCurrentUser();
+  const router = useRouter();
   const queryClient = useQueryClient();
-
   const GoogleAuthToken = async (data: any) => {
     const toastId = toast.loading("loading..", Data.toastStyle);
 
@@ -85,10 +90,14 @@ const Sidebars = ({ children }: { children: React.ReactNode }) => {
       return null;
     }
     const Token = res.verifyGoogleToken!;
-    await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
     window.localStorage.setItem("__token", Token);
+    if (window.localStorage.getItem('__token')) {
+       await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    }
     toast.dismiss(toastId);
     toast.success("user logged in successfully", Data.toastStyle);
+    router.replace('/');
+    
   };
   if (isLoading) {
     return <Loading />;
@@ -97,29 +106,39 @@ const Sidebars = ({ children }: { children: React.ReactNode }) => {
     return <ErrorPage error={`Not able to fetch use details ${error.name}`} />;
   }
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between  font-mono text-sm`}
-      style={{ fontFamily: inter }}
-    >
-      <div className="grid grid-cols-12 h-screen w-screen">
-        <div className="col-span-3 pt-1 ml-28">
-          <div className="relativ text-2xl h-fit w-fit hover:bg-gray-800 rounded-full p-4 cursor-pointer transition-all">
-            <FaXTwitter />
+    <div>
+    <div className="grid grid-cols-12 h-screen w-screen sm:px-48">
+      <div className="col-span-2 md:col-span-3 pt-1 flex md:justify-center pr-4 relative">
+        <div>
+          <div className="text-2xl h-fit w-fit hover:bg-white hover:bg-opacity-10 rounded-full p-4 cursor-pointer transition-all">
+          <FaXTwitter />
           </div>
           <div className="mt-1 text-xl pr-4">
             <ul>
               {sidebarMenuItems.map((item) => (
-                <li
-                  className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full px-3 py-3 w-fit cursor-pointer mt-2"
-                  key={item.title}
-                >
-                  <span className="text-3xl">{item.icon}</span>
-                  <span>{item.title}</span>
+                <li key={item.title}>
+                  <Link
+                    className="flex justify-start items-center gap-4 hover:bg-white hover:bg-opacity-10 rounded-full px-3 py-3 w-fit cursor-pointer mt-2"
+                    href={item.Link ? item.Link : ''}
+                  >
+                    <span className=" text-3xl">{item.icon}</span>
+                    <span className="hidden md:inline text-lg ">{item.title}</span>
+                  </Link>
                 </li>
               ))}
             </ul>
-            {user ? (
-              <div className="hover:bg-gray-900 cursor-pointer rounded-full px-4 py-3  absolute bottom-4 ">
+            <div className="mt-5 px-3 md:block hidden">
+              <button className="hidden md:block bg-[#1d9bf0] font-semibold text-lg py-2 px-4 rounded-full w-full">
+                Tweet
+              </button>
+              <button className="block md:hidden bg-[#1d9bf0] font-semibold text-lg py-2 px-4 rounded-full w-full">
+                <BsTwitter />
+              </button>
+            </div>
+          </div>
+        </div>
+        {user ? (
+              <div className="hover:bg-white hover:bg-opacity-10 md:left-14 left-0 cursor-pointer rounded-full px-4 py-3  absolute bottom-4 ">
                 <div className="flex flex-row gap-2 items-center">
                   <Image
                     className="rounded-full "
@@ -132,7 +151,7 @@ const Sidebars = ({ children }: { children: React.ReactNode }) => {
                     height={40}
                     width={40}
                   />
-                  <div>
+                  <div className="lg:block hidden">
                     <h2 className="text-[13px] -mb-1">
                       {user?.firstName} {user?.lastName}
                     </h2>
@@ -141,21 +160,24 @@ const Sidebars = ({ children }: { children: React.ReactNode }) => {
                 </div>
               </div>
             ) : null}
-          </div>
-        </div>
-        <div className="no-scrollbar col-span-5 border-r-[0.4px] border-l-[0.4px] h-screen overflow-scroll border-l-white border-r-white border-opacity-20 ">
-          {children}
-        </div>
-        {user ? null : (
-          <div className={`col-span-3 p-6 `}>
-            <div className="bg-gray-800 p-6 rounded-lg w-auto flex justify-center flex-col">
-              <h1 className="text-center text-[15px] mb-4">New to X ?</h1>
-              <GoogleLogin onSuccess={(data) => GoogleAuthToken(data)} />
-            </div>
+      </div>
+      <div className="no-scrollbar col-span-10 md:col-span-6 border-r-[0.4px] border-l-[0.4px] h-screen overflow-scroll border-white border-opacity-20">
+        {children}
+      </div>
+      <div className="col-span-0 md:col-span-3 flex  ">
+      {user ? (<Recomended/>) : (
+          <div className={`  p-6 `}>
+            <div className="bg-white bg-opacity-5 border-[0.4px] border-white border-opacity-20 p-6 rounded-lg w-auto flex justify-center flex-col">
+              <h1 className="text-center text-[15px] mb-5">New to X ?</h1>
+              <div className="w-full justify-center items-center">
+                <GoogleLogin onSuccess={(data) => GoogleAuthToken(data)} />
+              </div>
+               </div>
           </div>
         )}
       </div>
-    </main>
+    </div>
+  </div>
   );
 };
 

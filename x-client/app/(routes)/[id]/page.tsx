@@ -7,6 +7,7 @@ import { getCurrentUserQuery } from '@/graphql/query/user';
 import { useCurrentUser, useGetUserbyId } from '@/hooks/user';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
 import { BsArrowLeftShort } from 'react-icons/bs';
@@ -26,12 +27,15 @@ const page = () => {
     await graphqlClient.request(unfollowUserMutation,{unfollowUserId:user?.id!})
     await queryClient.invalidateQueries({queryKey:['currentUser']})
   }
+  const profileImage = "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg";
   return (
     <div>
       <div>
         <nav className="flex items-center gap-3 py-3 px-3">
+          <Link href={'/'}>
           <BsArrowLeftShort className="text-4xl" />
-          <div>
+          </Link>
+           <div>
             <h1 className="text-xl font-bold">
               {user?.firstName} {user?.lastName}
             </h1>
@@ -41,15 +45,13 @@ const page = () => {
           </div>
         </nav>
         <div className="p-4 border-b border-slate-800">
-          {user?.profileImage && (
             <Image
-              src={user.profileImage}
+              src={user?.profileImage ? user.profileImage : profileImage}
               alt="user-image"
               className="rounded-full"
               width={100}
               height={100}
             />
-          )}
           <div className="flex justify-between">
             <div className="flex text-sm gap-2 mt-5 opacity-50">
               <p>
@@ -81,6 +83,9 @@ const page = () => {
           {user?.tweets?.map((tweet) => (
             <FeedCard data={tweet as Tweet} key={tweet?.id} />
           ))}
+          {user?.tweets?.length == 0 &&(
+            <div className='text-[14px] font-bold mt-10 mx-4 text-center'>No tweets found</div>
+          )}
         </div>
       </div>
     </div>

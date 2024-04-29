@@ -26,7 +26,7 @@ export default function RootLayout({
         <GoogleOAuthProvider clientId={clientId} >
         <ReactQueryProvider>
           <Sidebars>
-         {children}
+          {children}
          </Sidebars>
          </ReactQueryProvider>
         </GoogleOAuthProvider>

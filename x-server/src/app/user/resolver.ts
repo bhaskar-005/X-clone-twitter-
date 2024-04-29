@@ -5,6 +5,7 @@ import { graphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import { redisClient } from "../../redis";
 import { json } from "express";
+import { user } from ".";
 
 interface GoogleTokenPayload {
   iss: string;
@@ -131,22 +132,33 @@ const mutation = {
 
 const extraResolver = {
   User: {
-    recommendedUsers: async (_: any, perante: User, ctx: graphqlContext) => {
+    recommendedUsers: async (_: any, parent: User, ctx: graphqlContext) => {
       if (!ctx.User?.id) {
         throw new Error("User is not authorized");
       }
-      //first get your following
-      const myFollowings = await prisma.follows.findMany({
-        where: { follower: { id: ctx.User.id } },
-        include: {
-          following: {
-            include: { followers: { include: { following: true } } },
-          },
-        },
+    
+      // Get IDs of users the current user is following
+      const followingIds = await prisma.follows.findMany({
+        where: { followerId: ctx.User.id },
+        select: { followingId: true },
       });
+    
+      // Extract the following IDs from the result
+      const followingIdsArray = followingIds.map(follow => follow.followingId);
+    
+      // Fetch users not in the following list
+      const recommendedUsers = await prisma.user.findMany({
+        where: { NOT: [
+          { id: { in: followingIdsArray } },
+          { id: ctx.User.id }
+        ] },
+      });
+    
+      console.log(recommendedUsers);
       
-      return [];
-    },
+      return recommendedUsers;
+
+    },    
     tweets: (perent: User) =>
       prisma.tweet.findMany({ where: { author: { id: perent.id } } }),
     followers: async (perent: User) => {

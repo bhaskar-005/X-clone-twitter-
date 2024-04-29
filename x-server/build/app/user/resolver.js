@@ -118,21 +118,27 @@ const mutation = {
 };
 const extraResolver = {
     User: {
-        recommendedUsers: (_, perante, ctx) => __awaiter(void 0, void 0, void 0, function* () {
+        recommendedUsers: (_, parent, ctx) => __awaiter(void 0, void 0, void 0, function* () {
             var _g;
             if (!((_g = ctx.User) === null || _g === void 0 ? void 0 : _g.id)) {
                 throw new Error("User is not authorized");
             }
-            //first get your following
-            const myFollowings = yield db_1.prisma.follows.findMany({
-                where: { follower: { id: ctx.User.id } },
-                include: {
-                    following: {
-                        include: { followers: { include: { following: true } } },
-                    },
-                },
+            // Get IDs of users the current user is following
+            const followingIds = yield db_1.prisma.follows.findMany({
+                where: { followerId: ctx.User.id },
+                select: { followingId: true },
             });
-            return [];
+            // Extract the following IDs from the result
+            const followingIdsArray = followingIds.map(follow => follow.followingId);
+            // Fetch users not in the following list
+            const recommendedUsers = yield db_1.prisma.user.findMany({
+                where: { NOT: [
+                        { id: { in: followingIdsArray } },
+                        { id: ctx.User.id }
+                    ] },
+            });
+            console.log(recommendedUsers);
+            return recommendedUsers;
         }),
         tweets: (perent) => db_1.prisma.tweet.findMany({ where: { author: { id: perent.id } } }),
         followers: (perent) => __awaiter(void 0, void 0, void 0, function* () {

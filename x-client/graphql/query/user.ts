@@ -34,6 +34,13 @@ export const getCurrentUserQuery = graphql(`
         imageUrl
         videoUrl
       }
+      recommendedUsers{
+        email
+        firstName
+        lastName
+        profileImage
+        id
+      }
     }
   }
 `);
