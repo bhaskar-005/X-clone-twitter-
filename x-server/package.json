@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node build/index && prisma generate ",
+    "start": "prisma migrate deploy && prisma generate && npm run generate && node build/index ",
     "build": "tsc -p tsconfig.json",
     "dev": "tsc-watch --onSuccess \"npm start\"",
     "postinstall": "prisma generate"
